@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD MAPPER 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.kosta.coffeeorder.dao.impl.mapper.StoreMapper">
+
+	<resultMap id="store-resultmap" type="Store">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="storeGuidance" column="store_guidance" />
+		<result property="contactNumber" column="contact_number" />
+		<result property="location" column="location" />
+		<result property="businessHours" column="business_hours" />
+	</resultMap>
+
+	<select id="selectStores" resultMap="store-resultmap">
+		select
+		id,
+		name,
+		store_guidance,
+		contact_number,
+		location,
+		business_hours
+		from store
+	</select>
+
+	<select id="selectStoreByName" parameterType="string" resultMap="store-resultmap">
+		select
+		id,
+		name,
+		store_guidance,
+		contact_number,
+		location,
+		business_hours
+		from store
+		where name=#{value}
+	</select>
+
+	<select id="selectStoreById" parameterType="long" resultMap="store-resultmap">
+		select
+		id,
+		name,
+		store_guidance,
+		contact_number,
+		location,
+		business_hours
+		from store
+		where id=#{value}
+	</select>
+	<select id="selectOrderCount" resultType="integer"
+		parameterType="map">
+		select count(*)
+		from order_list
+		where store_id=#{store_id}
+		and receive_time=#{date}
+	</select>
+</mapper>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD MAPPER 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.kosta.coffeeorder.dao.impl.mapper.MemberMapper">
+
+	<insert id="insertMember" parameterType="Member" keyProperty="id"
+		keyColumn="id" useGeneratedKeys="true">
+		insert into member(
+			name,
+			device_id,
+			phone_number,
+			password,
+			point,
+			mileage ,
+			discount_card ,
+			preference_store
+		) values
+		(
+			#{name},
+			#{deviceId},
+			#{phoneNumber},
+			#{password},
+			#{point},
+			#{mileage},
+			#{discountCard},
+			#{preferenceStore}
+		)
+	</insert>
+	
+	<update id="updateMember" parameterType="Member">
+	    update member set
+	    	name=#{name},
+	    	password=#{password},
+	    	device_id=#{deviceId},
+	    	preference_store=#{preferenceStore}
+	    where id=#{id}
+	</update>
+	
+	<update id = "updatePoint" parameterType="Member">
+		update member set
+			point = #{point}
+		where id = #{id}
+	</update>
+	
+	<update id = "updateMileage" parameterType="Member">
+		update member set
+			mileage = #{mileage}
+		where id = #{id}
+	</update>
+	
+	
+	<delete id="deleteMember" parameterType="string">
+		delete from member where phone_number=#{value}
+	</delete>
+	
+	<resultMap type="Member" id="member-resultmap">
+		<id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="deviceId" column="device_id"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="password" column="password"/>
+        <result property="point" column="point"/>
+        <result property="mileage" column="mileage"/>
+        <result property="discountCard" column="discount_card"/>
+        <result property="preferenceStore" column="preference_store"/>
+	</resultMap>
+	<select id="selectMember" resultMap="member-resultmap" parameterType="string">
+        select
+        	id,
+        	name,
+			device_id,
+			phone_number,
+			password,
+			point,
+			mileage ,
+			discount_card ,
+			preference_store
+        from member
+        where phone_number=#{value}
+    </select>
+    
+	<select id="selectMemberById" resultMap="member-resultmap" parameterType="long">
+        select
+        	id,
+        	name,
+			device_id,
+			phone_number,
+			password,
+			point,
+			mileage ,
+			discount_card ,
+			preference_store
+        from member
+        where id=#{value}
+    </select>
+    
+	<select id="selectMembers" resultMap="member-resultmap">
+        select
+        	id,
+        	name,
+			device_id,
+			phone_number,
+			password,
+			point,
+			mileage ,
+			discount_card ,
+			preference_store
+        from member
+    </select>
+    
+    <select id="selectMembersBySearcyCond" resultMap="member-resultmap">
+    	select
+        	id,
+        	name,
+			device_id,
+			phone_number,
+			password,
+			point,
+			mileage ,
+			discount_card ,
+			preference_store
+        from member
+        limit #{limit} offset #{offset}
+    </select>
+    
+	<!-- <resultMap type="Coupon" id="coupon-resultmap">
+		<id property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="couponNumber" column="coupon_number"/>
+        <result property="whipping" column="whipping"/>
+        <result property="syrup" column="syrup"/>
+        <result property="shot" column="shot"/>
+        <result property="size" column="size"/>
+        <result property="temperature" column="temperature"/>
+        <result property="cup" column="cup"/>
+        <result property="coffeeId" column="coffee_id"/>
+	</resultMap>
+	<select id="selectMemberCoupon" resultMap="coupon-resultmap" parameterType="long">
+        select
+        	c.id,
+        	c.member_id,
+			c.coffee_id,
+			c.whipping,
+			c.syrup,
+			c.shot,
+			c.size,
+			c.temperature,
+			c.coupon_number,
+			c.cup
+        from coupon c
+        inner join member m on m.id= c.member_id
+        where c.member_id=#{value}
+    </select> -->
+    
+    <select id="selectTotalMember" resultType="int">
+    	select
+    		count(id)
+    	from member
+    </select>
+    
+    
+    <resultMap type="DiscountCard" id="discountCard-resultmap">
+		<id property="id" column="id"/>
+		<result property="cardName" column="card_name"/>
+		<result property="discountRate" column="discount_rate"/>
+    </resultMap>
+    
+    <select id="selectDiscountCard" resultMap="discountCard-resultmap" parameterType="long">
+    	select
+    		id,
+    		card_name,
+    		discount_rate
+    	form discount_card
+    </select>
+
+</mapper>
+

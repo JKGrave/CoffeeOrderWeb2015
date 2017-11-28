@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD MAPPER 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="kr.kosta.coffeeorder.dao.impl.mapper.AdminMapper">
+	
+	<insert id="insertAdmin" parameterType="Admin" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+		insert into admin (
+			store_id,
+			name,
+			account,
+			password,
+			phone_number,
+			email
+			) values (
+			#{storeId},
+			#{name},
+			#{account},
+			#{password},
+			#{phoneNumber},
+			#{email}
+			)
+	</insert>
+	
+	<update id="updateAdmin" parameterType="Admin" keyProperty="id" keyColumn="id">
+	    update admin set
+	    store_id=#{storeId}, 
+	    name=#{name}, 
+	    account=#{account}, 
+	    password=#{password},
+	    phone_number=#{phoneNumber},
+	    email=#{email}
+	    where id=#{id}
+	</update>
+	
+	<delete id="deleteAdmin" parameterType="Admin">
+	    delete from admin
+	    where id = #{id}
+	</delete>
+	
+	<delete id="deleteAdmins" parameterType="map">
+	    delete from admin
+	    where id in
+	    <foreach item="id" collection="idList" open="(" separator="," close=")">
+	        #{id}
+	    </foreach>
+	</delete>
+	
+	<resultMap id="admin-resultmap" type="Admin">
+	    <id property="id" column="id"/>
+	    <result property="name" column="name"/>
+	    <result property="account" column="account"/>
+	    <result property="password" column="password"/>
+	    <result property="phoneNumber" column="phone_number"/>
+	    <result property="email" column="email"/>
+	    <association property="store" javaType="Store">
+	   		<id property="id" column="store_id"/>
+	   		<result property="name" column="store_name"/>
+	    </association>
+	</resultMap>
+	
+	<select id="selectAdmin" resultMap="admin-resultmap">
+	    select
+	    	a.id,
+	    	s.id as store_id,
+	    	s.name as store_name,
+	    	a.name,
+	    	a.account,
+	    	a.password,
+	    	a.phone_number,
+	    	a.email
+	    from admin a
+	    	inner join store s on s.id = a.store_id
+	    where id = #{id}
+	</select>
+	
+	<select id="selectAdmins" resultMap="admin-resultmap">
+	     select
+	    	a.id,
+	    	s.id as store_id,
+	    	s.name as store_name,
+	    	a.name,
+	    	a.account,
+	    	a.password,
+	    	a.phone_number,
+	    	a.email
+	    from admin a
+	    	inner join store s on s.id = a.store_id
+	</select>
+	
+	<select id="selectAdminByAccount" parameterType="string" resultMap="admin-resultmap">
+	    select
+	    	a.id,
+	    	s.id as store_id,
+	    	s.name as store_name,
+	    	a.name,
+	    	a.account,
+	    	a.password,
+	    	a.phone_number,
+	    	a.email
+	    from admin a
+	    	inner join store s on s.id = a.store_id
+	    where account = #{value}
+	</select>
+
+</mapper>

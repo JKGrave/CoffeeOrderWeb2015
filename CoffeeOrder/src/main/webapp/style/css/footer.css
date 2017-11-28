@@ -1,0 +1,13 @@
+@CHARSET "UTF-8";
+/* html, body { width: 100%; height: 100%; margin: 0; padding: 0; } */
+
+div#Footer { /* 하단 */
+	clear: both;
+	width:100%; 
+	height:30px;
+	text-align:center;
+	margin:0px;
+	/* padding:0px; */
+	padding-top: 5px;
+   	background-color:#eeeeff;
+}

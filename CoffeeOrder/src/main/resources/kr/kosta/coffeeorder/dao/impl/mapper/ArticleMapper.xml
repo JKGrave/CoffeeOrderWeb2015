@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD MAPPER 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="kr.kosta.coffeeorder.dao.impl.mapper.ArticleMapper">
+    
+    <insert id="insertArticle" parameterType="Article" keyProperty="id" keyColumn="id">
+        insert into article (
+        	board_id,
+        	title,
+        	contents,
+        	read_count,
+        	create_date,
+        	writer
+        ) values (
+        	#{boardId},
+        	#{title},
+        	#{contents},
+        	#{readCount},
+        	#{createDate},
+        	#{writer.id}
+        )
+    </insert>
+    
+    <update id="updateArticle" parameterType="Article" keyProperty="id" keyColumn="id">
+        update article set
+        	board_id=#{boardId},
+        	title=#{title},
+        	contents=#{contents},
+        	read_count=#{readCount},
+        	create_date=#{createDate},
+        	writer=#{writer.id}
+        where id=#{id}
+    </update>
+    
+    <update id="updateReadCount" parameterType="long">
+    	update article set
+    		read_count = read_count+1
+    	where id=#{id}
+    
+    </update>
+    
+    <delete id="deleteArticle" parameterType="Article">
+        delete from article
+        where id=#{id}
+    </delete>
+    
+    <delete id="deleteArticles" parameterType="map">
+        delete from article
+        where id in
+        <foreach item="id" collection="idList" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <resultMap id="article-resultmap" type="Article">
+        <id property="id" column="id"/>
+        <result property="boardId" column="board_id"/>
+        <result property="boardName" column="board_name"/>
+        <result property="title" column="title"/>
+        <result property="contents" column="contents"/>
+        <result property="readCount" column="read_count"/>
+        <result property="createDate" column="create_date"/>
+        <association property="writer" javaType="Store">
+        	<id property="id" column="store_id"/>
+        	<result property="name" column="store_name"/>
+        </association>
+    </resultMap>
+    
+    <select id="selectArticle" parameterType="long" resultMap="article-resultmap">
+        select
+        	a.id,
+        	a.board_id,
+        	b.name as board_name,
+        	a.title,
+        	a.contents,
+        	a.read_count,
+        	a.create_date,
+        	s.id as store_id,
+        	s.name as store_name
+        from article a
+        	inner join store s on s.id = a.writer
+        	inner join board b on b.id = a.board_id
+        where a.id = #{id}
+    </select>
+    
+    <select id="selectArticles" resultMap="article-resultmap">
+        select
+        	a.id,
+        	a.board_id,
+        	b.name as board_name,
+        	a.title,
+        	a.contents,
+        	a.read_count,
+        	a.create_date,
+        	s.id as store_id,
+        	s.name as store_name
+        from article a
+        	inner join store s on s.id = a.writer
+        	inner join board b on b.id = a.board_id
+        where s.id = #{value}
+        order by a.id desc
+    </select>
+    
+    <select id="selectArticlesBySearchCond" parameterType="ArticleSearchCond" resultMap="article-resultmap">
+        select
+        	a.id,
+        	a.board_id,
+        	b.name as board_name,
+        	a.title,
+        	a.contents,
+        	a.read_count,
+        	a.create_date,
+        	s.id as store_id,
+        	s.name as store_name
+        from article a
+        	inner join store s on s.id = a.writer
+        	inner join board b on b.id = a.board_id
+        <trim prefix="where " prefixOverrides="and|or">
+			<if test="boardId != null">
+				a.board_id = #{boardId}
+			</if>
+			<if test="storeId != null">
+				and s.id = #{storeId}
+			</if>
+		</trim> 
+        order by a.id desc
+        limit #{limit} offset #{offset}
+    </select>
+    
+    
+    
+    
+    <select id="selectArticleTotalCount" parameterType="ArticleSearchCond" resultType="int">
+    	select
+    		count(a.id)
+    	from article a
+    		inner join store s on s.id = a.writer
+    	<trim prefix="where " prefixOverrides="and|or">
+			<if test="boardId != null">
+				a.board_id = #{boardId}
+			</if>
+			<if test="storeId != null">
+				and s.id = #{storeId}
+			</if>
+		</trim>
+    </select>
+    
+</mapper>

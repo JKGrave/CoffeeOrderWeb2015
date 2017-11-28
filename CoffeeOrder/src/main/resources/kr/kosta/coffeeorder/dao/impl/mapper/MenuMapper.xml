@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD MAPPER 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	
+<mapper namespace="kr.kosta.coffeeorder.dao.impl.mapper.MenuMapper">
+    
+    <insert id="insertMenu" parameterType="Menu" keyProperty="id"
+        keyColumn="id" useGeneratedKeys="true">
+        
+        insert 
+        into menu
+        	(name, url)
+        	values(#{name}, #{url})
+        	
+    </insert>
+    
+    <update id="updateMenu" parameterType="Menu" keyProperty="id"
+        keyColumn="id">
+        
+        update 
+        menu set
+        	name=#{name}, url=#{url}
+        where id = #{id}
+    
+    </update>
+    
+    <delete id="deleteMenu" parameterType="Menu">
+        delete 
+        from menu
+        where id = #{id}
+    </delete>
+    
+    <delete id="deleteMenus" parameterType="map">
+        delete
+        from menu
+        where id in
+        <foreach item="id" collection="idList" open="(" separator=","  close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <resultMap id="menu-resultmap" type="Menu">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="url" column="url"/>
+    </resultMap>
+    
+    <select id="selectMenu" resultMap="menu-resultmap">
+        select
+        	id,
+        	name,
+        	url
+        from menu
+        where id = #{id}
+    </select>
+    
+    <select id="selectMenus" resultMap="menu-resultmap">
+        select
+        	id,
+        	name,
+        	url
+        from menu
+    </select>
+    
+</mapper>

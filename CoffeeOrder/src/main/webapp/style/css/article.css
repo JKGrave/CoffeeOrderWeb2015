@@ -1,0 +1,12 @@
+@CHARSET "UTF-8";
+
+
+#article_wrap_div{
+	width:70%;
+	margin-left:96px;
+}
+
+.articleBtn{
+	float: right;
+	margin: 2px;
+}

@@ -1,0 +1,64 @@
+@CHARSET "UTF-8";
+
+#coffee{ /* 커피선택 */
+	margin-left: 5%;
+	width:15%;
+	float: left;
+}
+
+#option{ /* 옵션선택 */
+	width:75%;
+	float: left;
+	margin-left: 1%;
+}
+
+#order { /* 음료선택 확인창 */
+	width: 90%;
+	margin-left: 5%;
+}
+#order > table {
+	border-top: 1px solid;
+	padding-top: 5px;
+}
+
+#coffee > table > thead > tr > th,
+#option > table > thead > tr > th,
+#option > table > tbody > tr > th,
+#order > table > thead > tr > th,
+.left > table > thead > tr> th {
+	font-size: 16px;
+	text-align: center;
+	font-family: 나눔고딕;
+}
+
+
+.left { /* 입력폼, 회원정보 */
+	width: 40%;
+	margin-left: 5%;
+	float: left;
+}
+
+.left > table {
+	margin-top: 4%;
+}
+
+.right { /* 결제수단선택 */
+	width: 40%;
+	margin-left: 5%;
+	float: left;
+}
+
+#totalPrice{ /* 가격표시 글씨 */
+	text-align: right;
+	font-family: pencil;
+	font-size: 20px;
+}
+#totalPrice > strong { /* 가격표시 숫자 */
+	font-size: 30px;
+	color: blue;
+}
+
+.right p { /* 결제수단 글씨*/
+	font-family: pencil;
+	font-size: 30px;
+}

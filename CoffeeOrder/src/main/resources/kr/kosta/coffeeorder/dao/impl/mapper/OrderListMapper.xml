@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD MAPPER 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	
+<mapper namespace="kr.kosta.coffeeorder.dao.impl.mapper.OrderListMapper">
+
+    <insert id="insertOrderList" parameterType="OrderList" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+    	insert into order_list (
+    		member_id,
+    		store_id,
+    		payment_id,
+    		coffee_id,
+        	whipping,
+        	syrup,
+        	shot,
+        	size,
+        	temperature,
+        	cup,
+        	pay_chk,
+        	receive_chk,
+        	receive_time
+    	) values (
+      		#{member.id},
+    		#{store.id},
+    		#{payment.id},
+    		#{coffee.id},
+    		#{whipping.code},
+    		#{syrup.code},
+    		#{shot.code},
+    		#{size.code},
+    		#{temperature.code},
+    		#{cup.code},
+    		#{payChk},
+    		#{receiveChk},
+    		#{receiveTime}
+    	)
+    </insert>
+   
+    <update id="updateOrderMember" parameterType="long">
+        update
+        order_list set
+        	member_id = #{value}
+        where pay_chk = 0
+    </update>
+    
+    <update id="updatePaymentStatus" parameterType="long">
+        update
+        order_list set
+        	payment_id = #{value},
+        	pay_chk = 1
+        where pay_chk = 0   
+    </update>
+    
+    <update id="updateReceiveCheck" parameterType="map">
+        update 
+        order_list set
+        	receive_chk = 1
+        where id in
+        <foreach  item="id" collection="idList" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    
+    <delete id="deleteNonePayOrderList">
+    	delete
+    	from order_list
+    	where pay_chk =0;
+    </delete>
+    
+    <resultMap  id="orderlist-resultmap" type="OrderList">
+        <id property="id" column="id"/>
+        <result property="payChk" column="pay_chk"/>
+        <result property="receiveChk" column="receive_chk"/>
+        <result property="receiveTime" column="receive_time"/>
+        <association property="member" javaType="Member">
+            <id property="id" column="member_id"/>
+            <result property="name" column="member_name"/>
+      		<result property="phoneNumber" column="member_num"/>
+        </association>
+        <association property="store" javaType="Store">
+            <id property="id" column="store_id"/>
+            <result property="name" column="store_name"/>
+        </association>
+        <association property="payment" javaType="Payment">
+            <id property="id" column="payment_id"/>
+            <result property="name" column="payment_name"/>            
+        </association>
+        <association property="coffee" javaType="Coffee">
+            <id property="id" column="coffee_id"/>
+            <result property="name" column="coffee_name"/>
+            <result property="price" column="coffee_price"/>
+        </association>
+        <association property="whipping" javaType="Code">
+            <result property="code" column="whipping_code"/>
+            <result property="name" column="whipping_name"/>
+        </association>
+        <association property="syrup" javaType="Code">
+            <result property="code" column="syrup_code"/>
+            <result property="name" column="syrup_name"/>
+        </association>
+        <association property="shot" javaType="Code">
+            <result property="code" column="shot_code"/>
+            <result property="name" column="shot_name"/>
+        </association>
+        <association property="size" javaType="Code">
+            <result property="code" column="size_code"/>
+            <result property="name" column="size_name"/>
+        </association>
+        <association property="temperature" javaType="Code">
+            <result property="code" column="temperature_code"/>
+            <result property="name" column="temperature_name"/>
+        </association>
+        <association property="cup" javaType="Code">
+            <result property="code" column="cup_code"/>
+            <result property="name" column="cup_name"/>
+        </association>
+    </resultMap>
+    
+    <select id="selectOrderLists" parameterType="long" resultMap="orderlist-resultmap">
+        select
+        	o.id,
+        	m.id as member_id,
+        	m.name as member_name,
+        	m.phone_number as member_num,
+        	s.id as store_id,
+        	s.name as store_name,
+        	p.id as payment_id,
+        	p.name as payment_name,
+        	cf.id as coffee_id,
+        	cf.name as coffee_name,
+        	cf.price as coffee_price,
+        	wc.code as whipping_code,
+        	wc.name as whipping_name,
+        	syc.code as syrup_code,
+        	syc.name as syrup_name,
+        	shc.code as shot_code,
+        	shc.name as shot_name,
+        	sic.code as size_code,
+        	sic.name as size_name,
+        	tc.code as temperature_code,
+        	tc.name as temperature_name,
+        	cc.code as cup_code,
+        	cc.name as cup_name,
+        	o.pay_chk,
+        	o.receive_chk,
+        	o.receive_time
+       	from order_list o
+       		inner join member m on m.id = o.member_id
+       		inner join store s on s.id = o.store_id
+       		inner join payment p on p.id = o.payment_id
+       		inner join coffee cf on cf.id = o.coffee_id
+       		left outer join code wc on wc.code = o.whipping and wc.group_code = 'WHIPPING'
+       		left outer join code syc on syc.code = o.syrup and syc.group_code = 'SYRUP'
+       		left outer join code shc on shc.code = o.shot and shc.group_code = 'SHOT'
+       		left outer join code sic on sic.code = o.size and sic.group_code = 'SIZE'
+       		left outer join code tc on tc.code = o.temperature and tc.group_code = 'TEMPERATURE'
+       		left outer join code cc on cc.code = o.cup and cc.group_code = 'CUP'
+       	where receive_chk = 0 and
+       		o.store_id = #{value}
+       	order by o.receive_time desc, o.id desc
+    </select>
+    
+    <select id="selectOrderById" parameterType="long" resultMap="orderlist-resultmap">
+     	select
+        	o.id,
+        	m.id as member_id,
+        	m.name as member_name,
+        	m.phone_number as member_num,
+        	s.id as store_id,
+        	s.name as store_name,
+        	p.id as payment_id,
+        	p.name as payment_name,
+        	cf.id as coffee_id,
+        	cf.name as coffee_name,
+        	cf.price as coffee_price,
+        	wc.code as whipping_code,
+        	wc.name as whipping_name,
+        	syc.code as syrup_code,
+        	syc.name as syrup_name,
+        	shc.code as shot_code,
+        	shc.name as shot_name,
+        	sic.code as size_code,
+        	sic.name as size_name,
+        	tc.code as temperature_code,
+        	tc.name as temperature_name,
+        	cc.code as cup_code,
+        	cc.name as cup_name,
+        	o.pay_chk,
+        	o.receive_chk,
+        	o.receive_time
+       	from order_list o
+       		inner join member m on m.id = o.member_id
+       		inner join store s on s.id = o.store_id
+       		inner join payment p on p.id = o.payment_id
+       		inner join coffee cf on cf.id = o.coffee_id
+       		left outer join code wc on wc.code = o.whipping and wc.group_code = 'WHIPPING'
+       		left outer join code syc on syc.code = o.syrup and syc.group_code = 'SYRUP'
+       		left outer join code shc on shc.code = o.shot and shc.group_code = 'SHOT'
+       		left outer join code sic on sic.code = o.size and sic.group_code = 'SIZE'
+       		left outer join code tc on tc.code = o.temperature and tc.group_code = 'TEMPERATURE'
+       		left outer join code cc on cc.code = o.cup and cc.group_code = 'CUP'
+       	where o.id = #{value}
+     </select>
+    
+     <resultMap  id="nonePayOrderlist-resultmap" type="OrderList">
+        <id property="id" column="id"/>
+        <result property="payChk" column="pay_chk"/>
+        <result property="receiveChk" column="receive_chk"/>
+        <result property="receiveTime" column="receive_time"/>
+        <association property="coffee" javaType="Coffee">
+            <id property="id" column="coffee_id"/>
+            <result property="name" column="coffee_name"/>
+            <result property="price" column="coffee_price"/>
+        </association>
+        <association property="whipping" javaType="Code">
+            <result property="code" column="whipping_code"/>
+            <result property="name" column="whipping_name"/>
+        </association>
+        <association property="syrup" javaType="Code">
+            <result property="code" column="syrup_code"/>
+            <result property="name" column="syrup_name"/>
+        </association>
+        <association property="shot" javaType="Code">
+            <result property="code" column="shot_code"/>
+            <result property="name" column="shot_name"/>
+        </association>
+        <association property="size" javaType="Code">
+            <result property="code" column="size_code"/>
+            <result property="name" column="size_name"/>
+        </association>
+        <association property="temperature" javaType="Code">
+            <result property="code" column="temperature_code"/>
+            <result property="name" column="temperature_name"/>
+        </association>
+        <association property="cup" javaType="Code">
+            <result property="code" column="cup_code"/>
+            <result property="name" column="cup_name"/>
+        </association>
+    </resultMap>
+    
+     <select id="selectNonePayOrderLists" parameterType="long" resultMap="nonePayOrderlist-resultmap">
+        select
+        	o.id,
+        	cf.id as coffee_id,
+        	cf.name as coffee_name,
+        	cf.price as coffee_price,
+        	wc.code as whipping_code,
+        	wc.name as whipping_name,
+        	syc.code as syrup_code,
+        	syc.name as syrup_name,
+        	shc.code as shot_code,
+        	shc.name as shot_name,
+        	sic.code as size_code,
+        	sic.name as size_name,
+        	tc.code as temperature_code,
+        	tc.name as temperature_name,
+        	cc.code as cup_code,
+        	cc.name as cup_name,
+        	o.pay_chk,
+        	o.receive_chk,
+        	o.receive_time
+       	from order_list o
+       		inner join coffee cf on cf.id = o.coffee_id
+       		left outer join code wc on wc.code = o.whipping and wc.group_code = 'WHIPPING'
+       		left outer join code syc on syc.code = o.syrup and syc.group_code = 'SYRUP'
+       		left outer join code shc on shc.code = o.shot and shc.group_code = 'SHOT'
+       		left outer join code sic on sic.code = o.size and sic.group_code = 'SIZE'
+       		left outer join code tc on tc.code = o.temperature and tc.group_code = 'TEMPERATURE'
+       		left outer join code cc on cc.code = o.cup and cc.group_code = 'CUP'
+       	where o.pay_chk = false and
+       		o.store_id = #{value}
+    </select>
+    
+    
+    <select id="selectCoffeeCount" resultType="long" parameterType="long">
+    	select
+    		count(id)
+    	from order_list
+    	where member_id = #{value} and receive_chk = 0
+    </select>
+     
+     <resultMap id="code-resultmap" type="Code" >
+         <id property="code" column="code"/>
+         <id property="groupCode" column="group_code"/>
+         <result property="name" column="name"/>
+     </resultMap>
+     
+     <select id="selectCodeByOption" parameterType="string" resultMap="code-resultmap">
+         select
+         	group_code,
+         	code,
+         	name
+         from code
+         where group_code = #{value}
+     </select>
+     
+     <select id="selectPrice" resultType="long">
+        select SUM(c.price)
+			from order_list ol
+				inner join coffee c on c.id = ol.coffee_id
+		where ol.pay_chk = 0 and ol.store_id = #{value}
+     </select>
+     
+     <resultMap id="profit-resultmap" type="Profit">
+     	<result property="name" column="name"/>
+     	<result property="sellCount" column="sell_count"/>
+     	<result property="profit" column="profit"/>
+     </resultMap>
+     
+     <select id = "selectDayProfit" parameterType="long" resultMap="profit-resultmap">
+    	SELECT
+ 		  	c.name,
+			count(c.id) as sell_count,
+			SUM(c.price) as profit
+		FROM order_list ol
+			inner join coffee c on c.id = ol.coffee_id
+		where 
+			DATE_FORMAT(receive_time,'%Y-%m-%d') = DATE_FORMAT(curdate(),'%Y-%m-%d')
+			and ol.pay_chk = 1
+			and ol.store_id = #{value}
+		GROUP BY c.id;
+     </select>
+     
+     <select id ="selectDayTotalProfit" parameterType="long" resultType="long">
+     	select
+     		SUM(c.price)
+     	from order_list ol
+     		inner join coffee c on c.id = ol.coffee_id
+     	where 
+     		DATE_FORMAT(receive_time,'%Y-%m-%d') = DATE_FORMAT(curdate(),'%Y-%m-%d') and
+     		ol.pay_chk = 1 and
+     		ol.store_id = #{value}
+     </select>
+     
+     <select id = "selectMonthProfit" parameterType="long" resultMap="profit-resultmap">
+    	SELECT
+ 		  	c.name,
+			count(c.id) as sell_count,
+			SUM(c.price) as profit
+		FROM order_list ol
+			inner join coffee c on c.id = ol.coffee_id
+		where 
+			DATE_FORMAT(receive_time,'%Y-%m') = DATE_FORMAT(curdate(),'%Y-%m')
+			and ol.pay_chk = 1
+			and ol.store_id = #{value}
+		GROUP BY c.id;
+     </select>
+     
+     <select id ="selectMonthTotalProfit" parameterType="long" resultType="long">
+     	select
+     		SUM(c.price)
+     	from order_list ol
+     		inner join coffee c on c.id = ol.coffee_id
+     	where 
+     		DATE_FORMAT(receive_time,'%Y-%m') = DATE_FORMAT(curdate(),'%Y-%m') and
+     		ol.pay_chk = 1 and
+     		ol.store_id = #{value}
+     </select>
+     
+     <select id = "selectYearProfit" parameterType="long" resultMap="profit-resultmap">
+    	SELECT
+ 		  	c.name,
+			count(c.id) as sell_count,
+			SUM(c.price) as profit
+		FROM order_list ol
+			inner join coffee c on c.id = ol.coffee_id
+		where 
+			DATE_FORMAT(receive_time,'%Y') = DATE_FORMAT(curdate(),'%Y')
+			and ol.pay_chk = 1
+			and ol.store_id = #{value}
+		GROUP BY c.id;
+     </select>
+     
+     <select id ="selectYearTotalProfit" parameterType="long" resultType="long">
+     	select
+     		SUM(c.price)
+     	from order_list ol
+     		inner join coffee c on c.id = ol.coffee_id
+     	where 
+     		DATE_FORMAT(receive_time,'%Y') = DATE_FORMAT(curdate(),'%Y') and
+     		ol.pay_chk = 1 and
+     		ol.store_id = #{value}
+     </select>
+     
+     <resultMap id="payment-resultmap" type="Payment" >
+         <id property="id" column="id"/>
+         <result property="name" column="name"/>         
+     </resultMap>
+     
+     <select id="selectPayment" resultMap="payment-resultmap">
+         select
+         	id,
+         	name
+         from payment
+     </select>
+     
+     <select id = "selectOrderMember" resultType="long">
+     	select
+     		member_id
+     	from order_list
+     	where pay_chk = 0
+     	group by member_id
+     </select>
+     
+     
+</mapper>

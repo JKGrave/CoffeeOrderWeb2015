@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD MAPPER 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.kosta.coffeeorder.dao.impl.mapper.InventoryMapper">
+    <insert id="insertInventory" parameterType="Inventory" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+        insert into inventory(
+        	store_id,
+        	name,
+        	amount
+        ) values(
+        	#{storeId},
+        	#{name},
+        	#{amount}
+        ) 
+    </insert> 
+     
+    <update id="updateInventory"  parameterType="Inventory" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+        update inventory set
+       	 	store_id=#{storeId},
+       		name=#{name},
+       		amount=#{amount}
+        where id=#{id}     
+    </update>
+    
+    <delete id="deleteInventory" parameterType="Inventory">
+        delete from inventory
+        where id=#{id}
+    </delete>
+    
+    <delete id="deleteInventoryList" parameterType="map">
+        delete from inventory
+        where id in
+        <foreach item="id" collection="idList" open="(" separator="," close=")">
+            #{id}            
+        </foreach>       
+    </delete>
+    
+    <resultMap id="inventory-resultmap" type="Inventory">
+        <id property="id" column="id"/>
+        <result property="storeId" column="store_id"/>
+        <result property="name" column="name"/>
+        <result property="amount" column="amount"/>        
+    </resultMap>
+    
+    <select id="selectInventory" resultMap="inventory-resultmap">
+        select
+        	id,
+        	store_id,
+        	name,
+        	amount
+        from inventory
+        where id=#{id}
+    </select>
+    
+    <select id="selectInventoryList" resultMap="inventory-resultmap">
+        select
+        	id,
+        	store_id,
+        	name,
+        	amount
+        from inventory        
+    </select>
+    
+    <select id="selectInventoryByStoreId" parameterType="long" resultMap="inventory-resultmap">
+    	select
+        	id,
+        	store_id,
+        	name,
+        	amount
+        from inventory
+        	where store_id = ${value}
+    </select>
+</mapper>

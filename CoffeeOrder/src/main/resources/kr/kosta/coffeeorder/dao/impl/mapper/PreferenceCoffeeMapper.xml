@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD MAPPER 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.kosta.coffeeorder.dao.impl.mapper.PreferenceCoffeeMapper">
+	<resultMap type="PreferenceCoffee" id="pref-coffee-resultmap">
+		<id property="id" column="id" />
+		<result property="memberId" column="member_id" />
+		<result property="coffeeId" column="coffee_id" />
+		<result property="whipping" column="whipping" />
+		<result property="syrup" column="syrup" />
+		<result property="shot" column="shot" />
+		<result property="size" column="size" />
+		<result property="cup" column="cup" />
+		<result property="temperature" column="temperature" />
+	</resultMap>
+
+	<select id="selectMemberPreferenceCoffee" resultMap="pref-coffee-resultmap"
+		parameterType="long">
+		select
+		pc.id,
+		pc.member_id,
+		pc.coffee_id,
+		pc.whipping,
+		pc.syrup,
+		pc.shot,
+		pc.size,
+		pc.cup,
+		pc.temperature
+		from preference_coffee
+		pc
+		inner join member m on m.id= pc.member_id
+		where pc.member_id=#{value}
+	</select>
+
+	<insert id="insertPrefCoffee" parameterType="PreferenceCoffee"
+		keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+		insert into preference_coffee
+		(
+		member_id,
+		coffee_id,
+		whipping,
+		syrup,
+		shot,
+		size,
+		cup,
+		temperature
+		)
+		values
+		(
+		#{memberId},
+		#{coffeeId},
+		#{whipping},
+		#{syrup},
+		#{shot},
+		#{size},
+		#{cup},
+		#{temperature}
+		)
+	</insert>
+
+	<delete id="deletePrefCoffee" parameterType="long">
+		delete from preference_coffee
+		where id=#{value}
+	</delete>
+</mapper>

@@ -1,0 +1,27 @@
+@CHARSET "UTF-8";
+
+div#header { /* 상단 */
+	height: 22%;
+	background-color: #eeeeff;	
+	clear: both;
+}
+.top{ /*상단이미지 */
+	width: 25%;
+	height: auto;
+	padding-left: 5px;
+	padding-bottom: 10px;
+}
+
+#headerText { /* 오른쪽글씨 */
+	font-family: pencil;
+	font-size:22px;
+	float:right;
+	margin-top: 20px;
+	margin-right: 20px;
+	color: #808080;
+}
+#dpTime{ /* 시간 */
+	font-size:26px;
+	font-family: CulDeSac, pencil;
+	color: black;
+}

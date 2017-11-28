@@ -1,0 +1,10 @@
+@CHARSET "UTF-8";
+
+div#menu { /* 메뉴 */
+	float: left;
+	width: 10%;
+	padding-top: 10px;	
+	padding-left: 5px;
+	padding-right: 5px;
+	text-align: center;
+}
